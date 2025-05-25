@@ -6,6 +6,8 @@ import (
 	"io"
 	"sync"
 	"testing"
+
+	"task-list-go/src/task"
 )
 
 type scenarioTester struct {
@@ -33,7 +35,7 @@ func TestRun(t *testing.T) {
 	var wg sync.WaitGroup
 	go func() {
 		wg.Add(1)
-		NewTaskList(inPR, outPW).Run()
+		task.NewTaskList(inPR, outPW).Run()
 		outPW.Close()
 		wg.Done()
 	}()
@@ -101,14 +103,14 @@ func TestRun(t *testing.T) {
 // execute calls a command, by writing it into the scenario writer.
 // It first reads the command prompt, then sends the command.
 func (t *scenarioTester) execute(cmd string) {
-	p := make([]byte, len(prompt))
+	p := make([]byte, len(task.Prompt))
 	_, err := t.outReader.Read(p)
 	if err != nil {
 		t.Errorf("Prompt could not be read: %v", err)
 		return
 	}
-	if string(p) != prompt {
-		t.Errorf("Invalid prompt, expected \"%s\", got \"%s\"", prompt, string(p))
+	if string(p) != task.Prompt {
+		t.Errorf("Invalid prompt, expected \"%s\", got \"%s\"", task.Prompt, string(p))
 		return
 	}
 	// send command

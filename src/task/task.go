@@ -1,4 +1,4 @@
-package main
+package task
 
 // Task describes an elementary task.
 type Task struct {

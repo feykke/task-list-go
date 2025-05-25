@@ -1,4 +1,4 @@
-package main
+package task
 
 import (
 	"bufio"
@@ -30,7 +30,7 @@ import (
 const (
 	// Quit is the text command used to quit the task manager.
 	Quit   string = "quit"
-	prompt string = "> "
+	Prompt string = "> "
 )
 
 // TaskList is a set of tasks, grouped by project.
@@ -57,7 +57,7 @@ func NewTaskList(in io.Reader, out io.Writer) *TaskList {
 func (l *TaskList) Run() {
 	scanner := bufio.NewScanner(l.in)
 
-	fmt.Fprint(l.out, prompt)
+	fmt.Fprint(l.out, Prompt)
 	for scanner.Scan() {
 		cmdLine := scanner.Text()
 		if cmdLine == Quit {
@@ -65,7 +65,7 @@ func (l *TaskList) Run() {
 		}
 
 		l.execute(cmdLine)
-		fmt.Fprint(l.out, prompt)
+		fmt.Fprint(l.out, Prompt)
 	}
 }
 

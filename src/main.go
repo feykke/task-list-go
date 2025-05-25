@@ -3,8 +3,11 @@
 // and then scans and executes user commands.
 package main
 
-import "os"
+import (
+	"os"
+	"task-list-go/src/task"
+)
 
 func main() {
-	NewTaskList(os.Stdin, os.Stdout).Run()
+	task.NewTaskList(os.Stdin, os.Stdout).Run()
 }
