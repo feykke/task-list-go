@@ -103,15 +103,13 @@ func (l *TaskList) error(command string) {
 }
 
 func (l *TaskList) show() {
-	// sort projects (to make output deterministic)
-	sortedProjects := make([]string, 0, len(l.projectTasks))
-	for project := range l.projectTasks {
-		sortedProjects = append(sortedProjects, project)
-	}
-	sort.Sort(sort.StringSlice(sortedProjects))
+	sortedProjects := l.sortProjects()
 
-	// show projects sequentially
-	for _, project := range sortedProjects {
+	showSequentially(sortedProjects, l)
+}
+
+func showSequentially(projectList []string, l *TaskList) {
+	for _, project := range projectList {
 		tasks := l.projectTasks[project]
 		fmt.Fprintf(l.out, "%s\n", project)
 		for _, task := range tasks {
@@ -123,6 +121,15 @@ func (l *TaskList) show() {
 		}
 		fmt.Fprintln(l.out)
 	}
+}
+
+func (l *TaskList) sortProjects() []string {
+	sortedProjects := make([]string, 0, len(l.projectTasks))
+	for project := range l.projectTasks {
+		sortedProjects = append(sortedProjects, project)
+	}
+	sort.Strings(sortedProjects)
+	return sortedProjects
 }
 
 func (l *TaskList) add(args []string) {
@@ -152,21 +159,25 @@ func (l *TaskList) addTask(projectName, description string) {
 	l.projectTasks[projectName] = append(tasks, NewTask(l.nextID(), description, false))
 }
 
-func (l *TaskList) check(idString string) {
-	l.setDone(idString, true)
+func (l *TaskList) check(taskId string) {
+	l.setDone(taskId, true)
 }
 
-func (l *TaskList) uncheck(idString string) {
-	l.setDone(idString, false)
+func (l *TaskList) uncheck(taskId string) {
+	l.setDone(taskId, false)
 }
 
-func (l *TaskList) setDone(idString string, done bool) {
-	id, err := strconv.ParseInt(idString, 10, 64)
+func (l *TaskList) setDone(taskId string, done bool) {
+	id, err := strconv.ParseInt(taskId, 10, 64)
 	if err != nil {
-		fmt.Fprintf(l.out, "Invalid ID \"%s\".\n", idString)
+		fmt.Fprintf(l.out, "Invalid ID \"%s\".\n", taskId)
 		return
 	}
 
+	changeTaskStatusById(l, id, done)
+}
+
+func changeTaskStatusById(l *TaskList, id int64, done bool) {
 	for _, tasks := range l.projectTasks {
 		for _, task := range tasks {
 			if task.GetID() == id {
